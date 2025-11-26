@@ -132,8 +132,8 @@ const Navbar = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="cursor-pointer px-8 py-2 bg-primary
-              hover:bg-primary-dull transition-all text-white rounded-lg
+              className="cursor-pointer px-4 sm:px-8 py-1.5 sm:py-2 bg-primary
+              hover:bg-primary-dull transition-all text-white rounded-lg text-xs sm:text-base
               " 
               onClick={()=>{
                 setOpen(false) // Close mobile menu

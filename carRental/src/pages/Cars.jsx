@@ -214,7 +214,9 @@ const Cars = () => {
             placeholder='Search by make, model, or feature'
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className='w-full h-full outline-none text-gray-500'
+            className='w-full h-full outline-none focus:outline-none text-gray-500'
+            style={{ boxShadow: 'none' }}
+            onFocus={(e) => e.target.style.outline = 'none'}
           />
           <img src={assets.filter_icon} alt='' className='w-4.5 h-4.5 ml-2' />
         </motion.div>

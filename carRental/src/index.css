@@ -111,6 +111,32 @@ img[loading="lazy"].loaded {
   }
 }
 
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  /* Prevent horizontal scroll */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Smaller buttons on mobile */
+  button {
+    min-height: 36px;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Input fields */
+  input, select {
+    min-height: 40px;
+    font-size: 0.875rem;
+  }
+}
+
 /* Hide number input spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

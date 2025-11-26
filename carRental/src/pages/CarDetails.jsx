@@ -316,7 +316,7 @@ const CarDetails = () => {
 
                       <button 
                         type="submit"
-                        className='w-full py-3 font-medium text-white rounded-xl transition-all bg-primary hover:bg-primary-dull cursor-pointer'
+                        className='w-full py-2 sm:py-3 font-medium text-white rounded-xl transition-all bg-primary hover:bg-primary-dull cursor-pointer text-xs sm:text-base'
                       >
                         Book Now
                       </button>
