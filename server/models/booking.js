@@ -1,0 +1,24 @@
+import mongoose from 'mongoose'
+const {ObjectId} =mongoose.Schema.Types
+
+const bookingSchema = new mongoose.Schema({
+    car:{type:ObjectId , ref:'Car', required:true},
+    user:{type:ObjectId , ref:'User', required:true},
+    owner:{type:ObjectId , ref:'User', required:true},
+    pickupDate:{type: Date, required:true},
+    returnDate:{type: Date, required:true},
+    status:{type:String, enum:["pending", "confirmed", "cancelled"], default:"pending"},
+    price:{type:Number, required:true},
+    originalPrice:{type:Number, required:true},
+    proposedPricePerDay:{type:Number},
+    counterPricePerDay:{type:Number},
+    isBargained:{type:Boolean, default:false},
+    hasCounterOffer:{type:Boolean, default:false},
+    paymentMethod:{type:String, enum:["online", "offline"], required:true},
+    paymentStatus:{type:String, enum:["pending", "paid"], default:"pending"}
+    
+},{timestamps:true})
+
+const Booking =mongoose.model('Booking',bookingSchema)
+
+export default Booking
