@@ -102,10 +102,14 @@ const fetchUser = async () => {
         if(token){
             axios.defaults.headers.common['Authorization']=`Bearer ${token}`
             fetchUser();
-            fetchCars();
         }
       
     },[token])
+
+    // Fetch cars on mount (regardless of login status)
+    useEffect(() => {
+        fetchCars();
+    }, [])
 
 
 

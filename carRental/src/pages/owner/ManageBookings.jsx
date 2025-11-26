@@ -160,30 +160,40 @@ const ManageBookings = () => {
 
                         {/* --------------first col -----------------------*/}
                           
-                          <td className='p-3 flex items-center gap-3'>
-
-                            <img src={booking.car.image} alt="" className='h-12 w-12 aspect-square rounded-md object-cover' />
-                            <div>
-                              <p className='font-medium max-md:hidden'>{booking.car.brand} {booking.car.model}</p>
-                              <div className='flex gap-1 mt-1'>
-                                {booking.isBargained && !booking.hasCounterOffer && (
-                                  <span className='text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full'>
-                                    Bargained
+                          <td className='p-3'>
+                            <div className='flex items-start gap-3'>
+                              <img src={booking.car.image} alt="" className='h-12 w-12 aspect-square rounded-md object-cover flex-shrink-0' />
+                              <div className='flex-1 min-w-0'>
+                                <p className='font-medium text-gray-800'>{booking.car.brand} {booking.car.model}</p>
+                                
+                                {/* Mobile: Show date range */}
+                                <p className='text-xs text-gray-600 mt-1 md:hidden'>
+                                  {new Date(booking.pickupDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(booking.returnDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </p>
+                                
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {booking.isBargained && !booking.hasCounterOffer && (
+                                    <span className='text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full'>
+                                      Bargained
+                                    </span>
+                                  )}
+                                  {booking.hasCounterOffer && (
+                                    <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full'>
+                                      Counter Sent
+                                    </span>
+                                  )}
+                                  {booking.isBargained && !booking.hasCounterOffer && booking.counterPricePerDay && (
+                                    <span className='text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full'>
+                                      ✓ Accepted
+                                    </span>
+                                  )}
+                                  {/* Mobile: Show payment method */}
+                                  <span className='md:hidden text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full'>
+                                    {booking.paymentMethod}
                                   </span>
-                                )}
-                                {booking.hasCounterOffer && (
-                                  <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full'>
-                                    Counter Sent
-                                  </span>
-                                )}
-                                {booking.isBargained && !booking.hasCounterOffer && booking.counterPricePerDay && (
-                                  <span className='text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full'>
-                                    ✓ Accepted
-                                  </span>
-                                )}
+                                </div>
                               </div>
                             </div>
-
                           </td>
 
                           {/*-------------- Second col-----------------------*/}
@@ -210,18 +220,30 @@ const ManageBookings = () => {
                           <td className='p-3'>
                             <div>
                               {booking.isBargained && (
-                                <div className='mb-2 p-2 bg-yellow-50 rounded'>
-                                  <p className='text-xs line-through' style={{color: '#9CA3AF'}}>{currency}{booking.originalPrice} total</p>
-                                  <p className='text-xs font-semibold' style={{color: '#2563EB'}}>User offered: {currency}{booking.proposedPricePerDay}/day</p>
+                                <div className='mb-2 p-2 bg-yellow-50 rounded text-xs'>
+                                  <p className='line-through text-gray-500'>{currency}{booking.originalPrice} total</p>
+                                  <p className='font-semibold text-blue-600'>User offered: {currency}{booking.proposedPricePerDay}/day</p>
                                 </div>
                               )}
-                              <p className={booking.isBargained ? 'font-bold' : ''} style={{color: booking.isBargained ? '#16A34A' : '#000000'}}>
-                                {currency}{booking.price} <span className='text-xs' style={{color: '#6B7280'}}>total</span>
+                              <p className={`font-semibold ${booking.isBargained ? 'text-green-600' : 'text-gray-800'}`}>
+                                {currency}{booking.price} <span className='text-xs text-gray-500 font-normal'>total</span>
                               </p>
                               {booking.isBargained && !booking.hasCounterOffer && booking.counterPricePerDay && (
-                                <p className='text-xs font-semibold mt-1' style={{color: '#16A34A'}}>
+                                <p className='text-xs font-semibold mt-1 text-green-600'>
                                   ✓ User accepted your offer
                                 </p>
+                              )}
+                              
+                              {/* Mobile: Show customer info for confirmed bookings */}
+                              {booking.status === 'confirmed' && booking.user && (
+                                <div className='mt-2 text-xs bg-blue-50 p-2 rounded space-y-1 md:hidden'>
+                                  <p className='font-semibold text-blue-800'>Customer:</p>
+                                  <p className='text-gray-700'>{booking.user.name}</p>
+                                  <p className='text-gray-600'>{booking.user.email}</p>
+                                  {booking.user.phone && (
+                                    <p className='text-gray-600'>📱 {booking.user.phone}</p>
+                                  )}
+                                </div>
                               )}
                             </div>
  

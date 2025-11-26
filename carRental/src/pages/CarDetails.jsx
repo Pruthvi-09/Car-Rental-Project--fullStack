@@ -10,7 +10,7 @@ import toast from 'react-hot-toast'
 const CarDetails = () => {
 
   const {id}=useParams()
-  const {cars, axios,pickupDate, setPickupDate, returnDate, setReturnDate, fetchCars}= useAppContext()
+  const {cars, axios,pickupDate, setPickupDate, returnDate, setReturnDate, fetchCars, user, setShowLogin}= useAppContext()
   const navigate=useNavigate()
   const [car,setCar]=useState(null)// for storing the car details
   const [paymentMethod, setPaymentMethod] = useState('offline') // Default to offline since online is unavailable
@@ -23,6 +23,13 @@ const CarDetails = () => {
 
   const handleSubmit = async (e)=>{
     e.preventDefault()
+    
+    // Check if user is logged in
+    if(!user){
+      toast.error('Please login to book a car')
+      setShowLogin(true)
+      return
+    }
     
     // Validate payment method
     if(paymentMethod === 'online'){

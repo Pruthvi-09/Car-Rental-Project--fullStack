@@ -16,21 +16,40 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate=useNavigate()  // for change the paths
 
-    const changeRole = async () => {
-  try {
-    const { data } = await axios.post('/api/owner/change-role');
+    const handleListCars = () => {
+      setOpen(false) // Close mobile menu
+      
+      // Check if user is logged in
+      if(!user){
+        toast.error('Please login to list your car')
+        setShowLogin(true)
+        return
+      }
 
-    if (data.success) {
-      setIsOwner(true);
-      toast.success(data.message);
-    } else {
-      toast.error(data.message);
+      // If logged in, proceed with role change or navigation
+      if(isOwner){
+        navigate('/owner')
+      } else {
+        changeRole()
+      }
     }
 
-  } catch (error) {
-    toast.error( "Login first");
-  }
-};
+    const changeRole = async () => {
+      try {
+        const { data } = await axios.post('/api/owner/change-role');
+
+        if (data.success) {
+          setIsOwner(true);
+          toast.success(data.message);
+          navigate('/owner/add-car')
+        } else {
+          toast.error(data.message);
+        }
+
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
 
   return (
     <motion.div 
@@ -60,7 +79,7 @@ const Navbar = () => {
         `}>
 
          {menuLinks.map((link, index) => (
-          <Link key={index} to={link.path}>
+          <Link key={index} to={link.path} onClick={() => setOpen(false)}>
             <motion.span
               whileHover={{ scale: 1.05, color: "#2563EB" }}
               transition={{ duration: 0.2 }}
@@ -105,7 +124,7 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="cursor-pointer" 
-              onClick={()=> isOwner? navigate('/owner'): changeRole()}
+              onClick={handleListCars}
             >
               {isOwner?"Dashboard":"List cars"}
             </motion.button>
@@ -116,7 +135,10 @@ const Navbar = () => {
               className="cursor-pointer px-8 py-2 bg-primary
               hover:bg-primary-dull transition-all text-white rounded-lg
               " 
-              onClick={()=>{user? logout(): setShowLogin(true)}}
+              onClick={()=>{
+                setOpen(false) // Close mobile menu
+                user ? logout() : setShowLogin(true)
+              }}
             > 
               {user ? 'Logout':'Login'}
             </motion.button>
