@@ -84,7 +84,7 @@ const MyBookings = () => {
   },[user])
   
   return (
-  <div className='px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w-7xl w-full mx-auto'>
+  <div className='px-4 sm:px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w-7xl w-full mx-auto'>
 
         <Title title='My Bookings'
         subTitle='View and manage your all car bookings'
@@ -106,7 +106,7 @@ const MyBookings = () => {
               }
               
               return (
-              <div key={booking._id} className='grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border border-borderColor rounded-lg mt-5 first:mt-12'>
+              <div key={booking._id} className='grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-6 border border-borderColor rounded-lg mt-5 first:mt-12'>
                  {/* ---------Car img + info -------------*/}
                           <div className='md:col-span-1'>
                             <div className='rounded-md overflow-hidden mb-3'>
@@ -145,13 +145,13 @@ const MyBookings = () => {
                         <div className='flex gap-2'>
                           <button
                             onClick={() => acceptCounterOffer(booking._id)}
-                            className='flex-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm rounded transition-colors'
+                            className='flex-1 px-2 sm:px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm rounded transition-colors'
                           >
                             ✓ Accept
                           </button>
                           <button
                             onClick={() => rejectCounterOffer(booking._id)}
-                            className='flex-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors'
+                            className='flex-1 px-2 sm:px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm rounded transition-colors'
                           >
                             ✕ Reject
                           </button>
@@ -216,7 +216,7 @@ const MyBookings = () => {
                    {booking.status === 'pending' && (
                      <button 
                        onClick={() => cancelBooking(booking._id)}
-                       className='px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-all'
+                       className='px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs sm:text-sm transition-all'
                      >
                        Cancel Booking
                      </button>

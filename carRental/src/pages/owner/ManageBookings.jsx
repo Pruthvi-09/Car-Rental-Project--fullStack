@@ -133,16 +133,19 @@ const ManageBookings = () => {
 
        <Title title='Manage Bookings' subTitle='Track all customer bookings, approve or cancel requests, and manage booking statuses' />
 
-       <div className='max-w-3xl w-full rounded-md overflow-hidden border border-borderColor mt-6'>
+       {/* Mobile scroll hint */}
+       <p className='text-xs text-gray-500 mt-4 md:hidden'>👉 Swipe left to see actions</p>
+       
+       <div className='max-w-3xl w-full rounded-md overflow-x-auto border border-borderColor mt-2 md:mt-6'>
          
-            <table className='w-full border-collapse text-left text-sm text-gray-600'>
-                <thead className='text-gray-600'>
+            <table className='w-full min-w-[700px] border-collapse text-left text-sm text-gray-600'>
+                <thead className='text-gray-600 bg-gray-50'>
                      <tr>
-                            <th className='p-3 font-medium'>Car</th>
-                             <th className='p-3 font-medium max-md:hidden'>Date Range</th>
-                              <th className='p-3 font-medium'>Total</th>
-                               <th className='p-3 font-medium max-md:hidden'>Payment</th>
-                                <th className='p-3 font-medium'>Actions</th>
+                            <th className='p-2 sm:p-3 font-medium text-xs sm:text-sm'>Car</th>
+                             <th className='p-2 sm:p-3 font-medium text-xs sm:text-sm max-md:hidden'>Date Range</th>
+                              <th className='p-2 sm:p-3 font-medium text-xs sm:text-sm'>Total</th>
+                               <th className='p-2 sm:p-3 font-medium text-xs sm:text-sm max-md:hidden'>Payment</th>
+                                <th className='p-2 sm:p-3 font-medium text-xs sm:text-sm whitespace-nowrap'>Actions</th>
                      </tr>
                 </thead>
 
@@ -262,21 +265,21 @@ const ManageBookings = () => {
 
                            {/*-------------- fifth col----------------------- */}
 
-                           <td className='p-3'>
+                           <td className='p-2 sm:p-3'>
                             {booking.status=== 'pending' ?(
-                              <div className='flex flex-col gap-2'>
-                                <select onChange={e=> changeBookingStatus(booking._id,e.target.value)} value={booking.status}  className='px-2 py-1.5 text-gray-500 border border-borderColor rounded-md outline-none bg-white cursor-pointer'>
+                              <div className='flex flex-col gap-2 min-w-[120px]'>
+                                <select onChange={e=> changeBookingStatus(booking._id,e.target.value)} value={booking.status}  className='px-2 py-1.5 text-xs sm:text-sm text-gray-500 border border-borderColor rounded-md outline-none bg-white cursor-pointer'>
                                     <option value="pending">Pending</option>
-                                    <option value="cancelled">Cancelled</option>
-                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancel</option>
+                                    <option value="confirmed">Confirm</option>
                                 </select>
                                 
                                 {(booking.isBargained || booking.proposedPricePerDay) && !booking.counterPricePerDay && (
                                   <button
                                     onClick={() => handleCounterOffer(booking._id)}
-                                    className='px-3 py-1.5 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold'
+                                    className='px-2 py-1.5 text-[10px] sm:text-xs bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold whitespace-nowrap'
                                   >
-                                    💰 Counter Offer
+                                    💰 Counter
                                   </button>
                                 )}
                                 
@@ -293,7 +296,7 @@ const ManageBookings = () => {
                                 )}
                               </div>
                             ) : (
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${booking.status === 'confirmed' ? 'bg-green-100 text-green-500' : 'bg-red-100 text-red-500'}`}>
+                              <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${booking.status === 'confirmed' ? 'bg-green-100 text-green-500' : 'bg-red-100 text-red-500'}`}>
                                  {booking.status}
                               </span>
                             )}

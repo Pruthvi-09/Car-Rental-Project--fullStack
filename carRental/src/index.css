@@ -149,6 +149,30 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* Horizontal scroll indicator */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #2563EB #f1f5f9;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #2563EB;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #1F58D8;
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
