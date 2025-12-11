@@ -1,7 +1,8 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Hero from '../components/Hero'
 import { LoadingSpinner } from '../components/LoadingSkeleton'
+import { useAppContext } from '../context/AppContext'
 
 // Lazy load components that are below the fold
 const FeaturedSection = lazy(() => import('../components/FeaturedSection'))
@@ -10,6 +11,13 @@ const Testimonials = lazy(() => import('../components/Testimonials'))
 const Newsletter = lazy(() => import('../components/Newsletter'))
 
 const Home = () => {
+  const { fetchCars } = useAppContext()
+  
+  // Refresh cars when home page loads
+  useEffect(() => {
+    fetchCars()
+  }, [])
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}

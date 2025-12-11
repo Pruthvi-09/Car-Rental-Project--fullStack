@@ -236,8 +236,14 @@ export const deleteCar= async (req,res)=>{
         }
 
         // Delete the car completely from database
-        await Car.findByIdAndDelete(carId)
-
+        const deletedCar = await Car.findByIdAndDelete(carId)
+        
+        if(!deletedCar){
+            console.log('❌ Failed to delete car from database')
+            return res.json({ success: false, message: 'Failed to delete car from database' })
+        }
+        
+        console.log('✅ Car deleted from database:', deletedCar._id)
         res.json({success:true, message:'Car deleted successfully'})
         
     } catch (error) {

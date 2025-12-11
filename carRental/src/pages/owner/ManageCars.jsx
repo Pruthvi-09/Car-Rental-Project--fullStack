@@ -57,17 +57,32 @@ const ManageCars = () => {
        const confirm= window.confirm('Are you sure? you want to delete this car?? ')
        if(!confirm) return null
 
+  console.log('🗑️ Attempting to delete car:', carId)
+  
   const {data}= await axios.post('/api/owner/delete-car',{carId})
+  
+  console.log('📡 Server response:', data)
+  
   if(data.success){
     toast.success(data.message)
-    // Refresh both local and global car lists
-    fetchOwnercars()
-    fetchCars() // This updates the global cars list
+    
+    console.log('✅ Car deleted successfully, refreshing lists...')
+    
+    // First update local state immediately for instant feedback
+    setCars(prevCars => prevCars.filter(car => car._id !== carId))
+    
+    // Then refresh both local and global car lists from server
+    await fetchCars() // This updates the global cars list
+    await fetchOwnercars() // This updates the owner's car list
+    
+    console.log('✅ Lists refreshed')
   }else{
+    console.log('❌ Delete failed:', data.message)
     toast.error(data.message)
   }
   
  } catch (error) {
+      console.error('❌ Delete error:', error)
       toast.error(error.message)
  }
  }
