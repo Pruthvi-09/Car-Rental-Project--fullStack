@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 const ManageCars = () => {
 
-  const {isOwner,axios, currency}=useAppContext()
+  const {isOwner,axios, currency, fetchCars}=useAppContext()
 
  const [cars, setCars]=useState([])
 
@@ -60,7 +60,9 @@ const ManageCars = () => {
   const {data}= await axios.post('/api/owner/delete-car',{carId})
   if(data.success){
     toast.success(data.message)
+    // Refresh both local and global car lists
     fetchOwnercars()
+    fetchCars() // This updates the global cars list
   }else{
     toast.error(data.message)
   }

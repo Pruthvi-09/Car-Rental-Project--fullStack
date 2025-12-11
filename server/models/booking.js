@@ -15,7 +15,10 @@ const bookingSchema = new mongoose.Schema({
     isBargained:{type:Boolean, default:false},
     hasCounterOffer:{type:Boolean, default:false},
     paymentMethod:{type:String, enum:["online", "offline"], required:true},
-    paymentStatus:{type:String, enum:["pending", "paid"], default:"pending"}
+    paymentStatus:{type:String, enum:["pending", "paid"], default:"pending"},
+    cancellationFee:{type:Number, default:0},
+    cancelledAt:{type:Date},
+    cancellationReason:{type:String}
     
 },{timestamps:true})
 

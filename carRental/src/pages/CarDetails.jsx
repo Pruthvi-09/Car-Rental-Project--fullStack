@@ -325,6 +325,29 @@ const CarDetails = () => {
                         💡 Check the booking schedule below to see available dates
                       </p>
 
+                      {/* Cancellation Policy Info */}
+                      <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-2 border-blue-300 dark:border-blue-700'>
+                        <p className='font-bold mb-3 text-sm' style={{color: '#000000'}}>📋 Cancellation Policy:</p>
+                        <ul className='space-y-2 text-xs'>
+                          <li className='flex items-start gap-2'>
+                            <span className='text-green-600 font-bold'>✓</span>
+                            <span style={{color: '#000000'}}><strong>Free cancellation</strong> 3+ days before pickup</span>
+                          </li>
+                          <li className='flex items-start gap-2'>
+                            <span className='text-orange-500'>•</span>
+                            <span style={{color: '#000000'}}><strong>25% fee</strong> if cancelled 1-3 days before</span>
+                          </li>
+                          <li className='flex items-start gap-2'>
+                            <span className='text-orange-500'>•</span>
+                            <span style={{color: '#000000'}}><strong>50% fee</strong> if cancelled within 24 hours</span>
+                          </li>
+                          <li className='flex items-start gap-2'>
+                            <span className='text-red-500'>⚠️</span>
+                            <span style={{color: '#000000'}}><strong>Stricter policies</strong> for confirmed bookings</span>
+                          </li>
+                        </ul>
+                      </div>
+
                       <p className='text-center text-sm'>{paymentMethod === 'online' ? 'Secure online payment' : 'Pay when you pick up the car'}</p>
 
                     </form>

@@ -26,14 +26,57 @@ const MyBookings = () => {
    }
   }
 
-  const cancelBooking = async (bookingId) => {
-    if(!window.confirm('Are you sure you want to cancel this booking?')) return
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null)
+  const [cancellationPolicy, setCancellationPolicy] = useState(null)
+  const [cancellationReason, setCancellationReason] = useState('')
+
+  const checkCancellationPolicy = async (bookingId) => {
+    try {
+      const {data} = await axios.post('/api/bookings/check-cancellation-policy', {bookingId})
+      
+      if(data.success){
+        return data.policy
+      } else {
+        toast.error(data.message)
+        return null
+      }
+    } catch (error) {
+      toast.error(error.message)
+      return null
+    }
+  }
+
+  const handleCancelClick = async (booking) => {
+    const policy = await checkCancellationPolicy(booking._id)
+    
+    if(!policy) return
+    
+    if(!policy.canCancel){
+      toast.error(policy.message)
+      return
+    }
+    
+    setSelectedBookingForCancel(booking)
+    setCancellationPolicy(policy)
+    setShowCancelModal(true)
+  }
+
+  const confirmCancellation = async () => {
+    if(!selectedBookingForCancel) return
 
     try {
-      const {data} = await axios.post('/api/bookings/cancel', {bookingId})
+      const {data} = await axios.post('/api/bookings/cancel', {
+        bookingId: selectedBookingForCancel._id,
+        reason: cancellationReason
+      })
       
       if(data.success){
         toast.success(data.message)
+        setShowCancelModal(false)
+        setSelectedBookingForCancel(null)
+        setCancellationPolicy(null)
+        setCancellationReason('')
         fetchMyBookings() // Refresh bookings
       } else {
         toast.error(data.message)
@@ -85,6 +128,85 @@ const MyBookings = () => {
   
   return (
   <div className='px-4 sm:px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w-7xl w-full mx-auto'>
+
+        {/* Cancellation Policy Modal */}
+        {showCancelModal && selectedBookingForCancel && cancellationPolicy && (
+          <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4' onClick={() => setShowCancelModal(false)}>
+            <div className='bg-white rounded-lg p-6 max-w-md w-full shadow-2xl' onClick={(e) => e.stopPropagation()}>
+              <h3 className='text-xl font-semibold mb-4' style={{color: '#000000'}}>⚠️ Cancellation Policy</h3>
+              
+              <div className='space-y-4 mb-6'>
+                <div className='bg-yellow-50 p-4 rounded-lg border-2 border-yellow-300'>
+                  <p className='text-sm mb-3' style={{color: '#000000'}}>{cancellationPolicy.message}</p>
+                  
+                  <div className='space-y-2 text-sm'>
+                    <div className='flex justify-between'>
+                      <span style={{color: '#666666'}}>Booking Amount:</span>
+                      <span className='font-semibold' style={{color: '#000000'}}>{currency}{selectedBookingForCancel.price}</span>
+                    </div>
+                    
+                    {cancellationPolicy.fee > 0 && (
+                      <>
+                        <div className='flex justify-between text-red-600'>
+                          <span>Cancellation Fee:</span>
+                          <span className='font-semibold'>- {currency}{cancellationPolicy.fee}</span>
+                        </div>
+                        <div className='flex justify-between text-green-600 pt-2 border-t-2 border-gray-300'>
+                          <span>Refund Amount:</span>
+                          <span className='font-semibold'>{currency}{cancellationPolicy.refundAmount}</span>
+                        </div>
+                      </>
+                    )}
+                    
+                    {cancellationPolicy.fee === 0 && (
+                      <div className='flex justify-between text-green-600 pt-2 border-t-2 border-gray-300'>
+                        <span>Full Refund:</span>
+                        <span className='font-semibold'>{currency}{selectedBookingForCancel.price}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className='text-xs mt-3' style={{color: '#666666'}}>
+                    📅 {cancellationPolicy.daysUntilPickup} days until pickup
+                  </p>
+                </div>
+
+                <div>
+                  <label className='block text-sm mb-2' style={{color: '#666666'}}>Reason for cancellation (optional)</label>
+                  <textarea
+                    value={cancellationReason}
+                    onChange={(e) => setCancellationReason(e.target.value)}
+                    placeholder='Let the owner know why you are cancelling...'
+                    className='w-full px-3 py-2 border-2 border-gray-300 rounded-lg outline-none bg-white resize-none'
+                    style={{color: '#000000'}}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className='flex gap-3'>
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false)
+                    setSelectedBookingForCancel(null)
+                    setCancellationPolicy(null)
+                    setCancellationReason('')
+                  }}
+                  className='flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition-colors'
+                  style={{color: '#000000'}}
+                >
+                  Keep Booking
+                </button>
+                <button
+                  onClick={confirmCancellation}
+                  className='flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold'
+                >
+                  Confirm Cancellation
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Title title='My Bookings'
         subTitle='View and manage your all car bookings'
@@ -211,11 +333,22 @@ const MyBookings = () => {
                      <p>Total Price</p>
                      <h1 className='text-2xl font-semibold text-primary'>{currency}{booking.price}</h1>
                      <p>Booked on {booking.createdAt.split('T')[0]}</p>
+                     
+                     {booking.status === 'cancelled' && booking.cancellationFee > 0 && (
+                       <div className='mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs'>
+                         <p className='text-red-600 dark:text-red-400'>Cancellation Fee: {currency}{booking.cancellationFee}</p>
+                         {booking.cancelledAt && (
+                           <p className='text-gray-500 dark:text-gray-400 mt-1'>
+                             Cancelled on {new Date(booking.cancelledAt).toLocaleDateString()}
+                           </p>
+                         )}
+                       </div>
+                     )}
                    </div>
 
-                   {booking.status === 'pending' && (
+                   {(booking.status === 'pending' || booking.status === 'confirmed') && (
                      <button 
-                       onClick={() => cancelBooking(booking._id)}
+                       onClick={() => handleCancelClick(booking)}
                        className='px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs sm:text-sm transition-all'
                      >
                        Cancel Booking

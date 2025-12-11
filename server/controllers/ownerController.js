@@ -203,7 +203,7 @@ export const toggleCarAvailability= async (req,res)=>{
 
 
 
-// API to remove a car from owner after booking -------------------------------------------------------------
+// API to delete a car completely -------------------------------------------------------------
 
 export const deleteCar= async (req,res)=>{
 
@@ -213,16 +213,32 @@ export const deleteCar= async (req,res)=>{
         const {carId}=req.body
         const car = await Car.findById(carId)
 
-        // Checking is car belongs to the user
+        if(!car){
+            return res.json({ success: false, message: 'Car not found'})
+        }
+
+        // Checking if car belongs to the user
         if(car.owner.toString() !== _id.toString()){
             return res.json({ success: false, message: 'Unauthorized'})
         }
 
-        car.owner=null;
-        car.isAvailable=false;
-        await car.save()
+        // Check if car has any active bookings
+        const activeBookings = await Booking.find({
+            car: carId,
+            status: { $in: ['pending', 'confirmed'] }
+        })
 
-        res.json({success:true, message:'Car Removed'})
+        if(activeBookings.length > 0){
+            return res.json({ 
+                success: false, 
+                message: 'Cannot delete car with active bookings. Please cancel or complete all bookings first.' 
+            })
+        }
+
+        // Delete the car completely from database
+        await Car.findByIdAndDelete(carId)
+
+        res.json({success:true, message:'Car deleted successfully'})
         
     } catch (error) {
 

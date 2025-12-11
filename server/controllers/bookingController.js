@@ -355,6 +355,140 @@ export const changeBookingStatus  = async(req,res)=>{
 export const cancelBooking = async(req,res)=>{
     try {
         const {_id} = req.user;
+        const {bookingId, reason}=req.body;
+
+        const booking = await Booking.findById(bookingId)
+
+        if(!booking){
+            return res.json({success:false, message:"Booking not found"})
+        }
+
+        // Check if booking belongs to user
+        if(booking.user.toString() !== _id.toString()){
+            return res.json({success:false, message:"Unauthorized"})
+        }
+
+        // Only allow cancellation if status is pending or confirmed
+        if(booking.status === 'cancelled'){
+            return res.json({success:false, message:"Booking is already cancelled"})
+        }
+
+        // Calculate cancellation fee based on policy
+        const cancellationResult = calculateCancellationFee(booking)
+        
+        if(!cancellationResult.canCancel){
+            return res.json({
+                success:false, 
+                message: cancellationResult.message
+            })
+        }
+
+        // Update booking status to cancelled
+        booking.status = 'cancelled'
+        booking.cancellationFee = cancellationResult.fee
+        booking.cancelledAt = new Date()
+        booking.cancellationReason = reason || 'User cancelled'
+        await booking.save()
+
+        // Make car available again
+        await Car.findByIdAndUpdate(booking.car, {
+            isAvailable: true,
+            bookedUntil: null
+        })
+
+        res.json({
+            success:true, 
+            message: cancellationResult.message,
+            cancellationFee: cancellationResult.fee,
+            refundAmount: cancellationResult.refundAmount
+        })
+
+    } catch (error) {
+        console.log(error.message)
+        res.json({success:false, message: error.message})
+    }
+}
+
+// Helper function to calculate cancellation fee
+const calculateCancellationFee = (booking) => {
+    const now = new Date()
+    const pickupDate = new Date(booking.pickupDate)
+    
+    // Calculate hours until pickup
+    const hoursUntilPickup = (pickupDate - now) / (1000 * 60 * 60)
+    const daysUntilPickup = hoursUntilPickup / 24
+    
+    console.log(`Cancellation check: ${daysUntilPickup.toFixed(1)} days until pickup`)
+    
+    let fee = 0
+    let refundPercentage = 100
+    let message = ""
+    let canCancel = true
+    
+    // Cancellation Policy Rules
+    if(booking.status === 'confirmed'){
+        // For confirmed bookings - stricter policy
+        if(daysUntilPickup < 1){
+            // Less than 24 hours - No cancellation allowed
+            canCancel = false
+            message = "Cannot cancel within 24 hours of pickup. Please contact the owner directly."
+        } else if(daysUntilPickup < 2){
+            // 1-2 days before - 100% cancellation fee (no refund)
+            fee = booking.price
+            refundPercentage = 0
+            message = "Cancellation fee: 100% (₹" + fee + "). Owner will receive full payment as compensation."
+        } else if(daysUntilPickup < 3){
+            // 2-3 days before - 75% cancellation fee
+            fee = Math.round(booking.price * 0.75)
+            refundPercentage = 25
+            message = "Cancellation fee: 75% (₹" + fee + "). You'll be charged this amount."
+        } else if(daysUntilPickup < 7){
+            // 3-7 days before - 50% cancellation fee
+            fee = Math.round(booking.price * 0.50)
+            refundPercentage = 50
+            message = "Cancellation fee: 50% (₹" + fee + "). You'll be charged this amount."
+        } else {
+            // 7+ days before - 25% cancellation fee
+            fee = Math.round(booking.price * 0.25)
+            refundPercentage = 75
+            message = "Cancellation fee: 25% (₹" + fee + "). You'll be charged this amount."
+        }
+    } else if(booking.status === 'pending'){
+        // For pending bookings - more lenient
+        if(daysUntilPickup < 1){
+            // Less than 24 hours
+            fee = Math.round(booking.price * 0.50)
+            refundPercentage = 50
+            message = "Cancellation fee: 50% (₹" + fee + ") for late cancellation."
+        } else if(daysUntilPickup < 3){
+            // 1-3 days before
+            fee = Math.round(booking.price * 0.25)
+            refundPercentage = 75
+            message = "Cancellation fee: 25% (₹" + fee + ")."
+        } else {
+            // 3+ days before - Free cancellation
+            fee = 0
+            refundPercentage = 100
+            message = "Booking cancelled successfully. No cancellation fee."
+        }
+    }
+    
+    const refundAmount = booking.price - fee
+    
+    return {
+        canCancel,
+        fee,
+        refundAmount,
+        refundPercentage,
+        message,
+        daysUntilPickup: daysUntilPickup.toFixed(1)
+    }
+}
+
+// New API to check cancellation policy before cancelling
+export const checkCancellationPolicy = async(req,res)=>{
+    try {
+        const {_id} = req.user;
         const {bookingId}=req.body;
 
         const booking = await Booking.findById(bookingId)
@@ -368,15 +502,16 @@ export const cancelBooking = async(req,res)=>{
             return res.json({success:false, message:"Unauthorized"})
         }
 
-        // Only allow cancellation if status is pending
-        if(booking.status !== 'pending'){
-            return res.json({success:false, message:"Cannot cancel confirmed or already cancelled booking"})
+        if(booking.status === 'cancelled'){
+            return res.json({success:false, message:"Booking is already cancelled"})
         }
 
-        // Delete the booking completely
-        await Booking.findByIdAndDelete(bookingId);
-
-        res.json({success:true, message:"Booking cancelled and removed"})
+        const cancellationResult = calculateCancellationFee(booking)
+        
+        res.json({
+            success:true, 
+            policy: cancellationResult
+        })
 
     } catch (error) {
         console.log(error.message)

@@ -38,7 +38,12 @@ const Sidebar = () => {
 
        <div className='group relative'>
           <label htmlFor="image">
-              <img src={image ? URL.createObjectURL(image) : user?.image || 'https://plus.unsplash.com/premium_photo-1677252438411-9a930d7a5168?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'} alt=""  className='h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto'/>
+              <img 
+                src={image ? URL.createObjectURL(image) : user?.image ? `${user.image}?t=${Date.now()}` : 'https://plus.unsplash.com/premium_photo-1677252438411-9a930d7a5168?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'} 
+                alt=""  
+                className='h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto object-cover'
+                key={user?.image}
+              />
                 {/* -------------------------Image accpets here from user -------------------------*/}
               <input type="file"  id="image" accept='image/*' hidden onChange={e=>setImage(e.target.files[0])}  className=''/>
 

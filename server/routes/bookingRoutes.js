@@ -1,5 +1,5 @@
 import express from 'express'
-import { acceptCounterOffer, cancelBooking, changeBookingStatus, checkAvailabilityOfCar, createBooking, getCarBookings, getOwnerBookings, getUserBookings, sendCounterOffer } from '../controllers/bookingController.js';
+import { acceptCounterOffer, cancelBooking, changeBookingStatus, checkAvailabilityOfCar, checkCancellationPolicy, createBooking, getCarBookings, getOwnerBookings, getUserBookings, sendCounterOffer } from '../controllers/bookingController.js';
 import {protect} from '../middleware/auth.js'
 
 const bookingRouter= express.Router();
@@ -15,6 +15,8 @@ bookingRouter.get('/owner',protect,getOwnerBookings)
 bookingRouter.post('/change-status',protect,changeBookingStatus)
 
 bookingRouter.post('/cancel',protect,cancelBooking)
+
+bookingRouter.post('/check-cancellation-policy',protect,checkCancellationPolicy)
 
 bookingRouter.post('/counter-offer',protect,sendCounterOffer)
 

@@ -146,9 +146,10 @@ const Navbar = () => {
              {/* User Profile Image - Always visible */}
              <div className="flex items-center gap-2">
                <img 
-                 src={user?.image || assets.user_profile} 
+                 src={user?.image ? `${user.image}?t=${Date.now()}` : assets.user_profile} 
                  alt={user?.name || 'User'} 
                  className="w-9 h-9 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                 key={user?.image} 
                />
                {user && <span className="text-base font-bold" style={{color: '#9CA3AF'}}>{user.name}</span>}
              </div>
